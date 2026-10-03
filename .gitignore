@@ -1,0 +1,7 @@
+venv/
+.env
+__pycache__/
+*.pyc
+data/SMSSpamCollection
+data/clean_nus_sms.csv
+data/combined.csv
