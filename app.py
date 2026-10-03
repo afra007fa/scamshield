@@ -57,7 +57,7 @@ if st.button("Analyze", type="primary"):
                 st.write("**Trigger words:** " + ", ".join(r["trigger_words"]))
             if r["urgency_words"]:
                 st.write("**Pressure words:** " + ", ".join(r["urgency_words"]))
-            if r["closest"]["similarity"] >= 0.4:
+            if r["closest"]["similarity"] >= 0.5:
                 st.write(
                     f"**Closest known scam type:** {r['closest']['scam_type']} "
                     f"(match {r['closest']['similarity']})"
