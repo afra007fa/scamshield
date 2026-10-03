@@ -12,8 +12,8 @@ People in India lose money to fake KYC, UPI refund, electricity bill, parcel, jo
 
 1. You paste a message.
 2. ScamShield gives a verdict (**Safe / Suspicious / Scam**) with a risk score out of 100.
-3. It shows **why**: trigger words, pressure words ("blocked", "today", "urgently") and the closest known scam type.
-4. It extracts **risky details**: links, phone numbers, amounts and bank or brand names.
+3. It shows **why**: trigger words, pressure words ("blocked", "today", "midnight") and, for strong matches, the closest known scam type.
+4. It extracts **risky details**: links (shown as plain text so nobody clicks them by accident), phone numbers, amounts and bank or brand names.
 5. Gemini writes a plain-language explanation and three safety tips, including the cyber fraud helpline (1930).
 
 ## How it works
@@ -21,11 +21,13 @@ People in India lose money to fake KYC, UPI refund, electricity bill, parcel, jo
 ```
 Message -> TF-IDF + Logistic Regression -> scam probability
         -> Pattern extraction (regex)    -> links, phones, amounts, brands
-        -> Pressure-word check           -> urgency score
+        -> Pressure-word and scam-phrase checks
         -> Cosine similarity             -> closest known scam type
         -> Combined risk score           -> Safe / Suspicious / Scam
         -> Gemini                        -> explanation and advice
 ```
+
+**Scoring:** the model's probability is the base. Links, phone numbers, brand names, pressure words, scam phrases (such as "lottery" or "reply with") and a strong similarity match each add points. If a message has none of these signals, the model's guess is weighted down, which reduces false alarms on normal messages about deliveries and bills.
 
 NLP techniques used: text preprocessing, TF-IDF word vectorization (unigrams and bigrams), logistic regression classification, pattern-based entity extraction, keyword-based urgency analysis, cosine similarity search, and LLM-generated explanations.
 
@@ -42,12 +44,14 @@ The large raw datasets are not stored in this repo. Download them from their ori
 
 - **97% accuracy** on 758 held-out messages (scam recall 93%, scam precision 91%).
 - Some repeated normal messages can appear in both the training and test sets, so this score is slightly optimistic.
-- The Indian scam examples are small and written by me, so real-world accuracy on new local scams will be lower.
+- The scoring rules (signal weights, scam phrases, the weight-down rule) were tuned by hand while looking at about a dozen example messages. They are not validated on a large independent test set.
+- The Indian examples are small and written by me, so real-world accuracy on new local scams will be lower.
 
 ## Limitations
 
-- Trained on public SMS data plus a small hand-written Indian set. It can miss new scam styles.
-- Normal messages that mention couriers or packages can be marked **Suspicious**. The app says so honestly instead of calling them scams.
+- Trained on public SMS data plus a small hand-written Indian set. It can miss new scam styles, especially ones with no link, phone number or pressure words.
+- Genuine messages that look like scams (for example, a real bank alert) can still be marked Suspicious or Scam.
+- Messages are mostly English. Regional languages and mixed-language text are not supported yet.
 - The AI explanation needs the Gemini API. If it is busy, the app retries, then falls back to the analysis alone.
 - It is a helper, not a guarantee. Never share OTPs or PINs.
 
@@ -83,16 +87,23 @@ Python, scikit-learn, pandas, Streamlit, Google Gemini API, Git and GitHub.
 
 ```
 scamshield/
-├── app.py            Streamlit app
+├── app.py              Streamlit app
 ├── src/
-│   ├── features.py   links, phones, amounts, pressure words
-│   ├── analyzer.py   model, trigger words, similarity, risk score
-│   ├── explain.py    Gemini explanation with retries
-│   ├── build_data.py combines datasets
-│   └── model.py      trains the classifier
-├── data/             Indian scam and normal message sets
-└── models/           saved model files
+│   ├── features.py     links, phones, amounts, pressure words, scam phrases
+│   ├── analyzer.py     model, trigger words, similarity, risk score
+│   ├── explain.py      Gemini explanation with retries
+│   ├── build_data.py   combines datasets
+│   ├── model.py        trains the classifier
+│   └── check_messages.py  quick sanity check on sample messages
+├── data/               Indian scam and normal message sets
+└── models/             saved model files
 ```
+
+## Future work
+
+- Collect more real Indian scam and normal messages, and validate on a separate test set
+- Support Hindi, Tamil and mixed-language messages
+- Let users report new scams to improve the dataset
 
 ## Educational use
 
