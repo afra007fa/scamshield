@@ -4,8 +4,8 @@ from src.explain import explain
 
 st.set_page_config(page_title="ScamShield", page_icon="🛡️")
 
-EX_KYC = "Dear customer, your SBI KYC has expired. Update now at http://sbi-kyc-update.xyz or your account will be blocked today."
-EX_UPI = "Sir, Rs 2,000 was sent to you by mistake on PhonePe. Please return it urgently to 9876543210."
+EX_KYC = "Axis Bank: Your account is on hold due to pending KYC. Submit your documents at http://axis-kyc-submit.top before midnight or it will be closed."
+EX_UPI = "Hi, I paid you Rs 3,500 on Google Pay by mistake. Kindly send it back to 9822000000, it is an emergency."
 EX_SAFE = "Hey, are we still meeting for dinner tonight? Mom said she will pick you up at 5."
 
 

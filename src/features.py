@@ -11,13 +11,21 @@ BRANDS = ["sbi", "hdfc", "icici", "axis", "kotak", "pnb", "paytm", "phonepe",
 URGENCY = ["immediately", "urgent", "urgently", "today", "right now", "act now",
            "last chance", "final notice", "blocked", "suspended", "expire",
            "disconnected", "within 24 hours", "within 1 hour", "avoid",
-           "verify", "limited time", "arrest", "legal action"]
+           "verify", "limited time", "arrest", "legal action",
+           "midnight", "emergency", "will be closed", "on hold",
+           "within 2 hours", "within 12 hours"]
+
+SCAM_PHRASES = ["lottery", "prize", "lucky winner", "has won", "have won",
+                "bank details", "reply with", "claim your",
+                "send your", "registration fee", "processing fee"]
 
 
 def analyze_features(text):
     low = text.lower()
     brands = [b for b in BRANDS if re.search(r"\b" + re.escape(b) + r"\b", low)]
     urgency = [u for u in URGENCY if u in low]
+    phrases = [p for p in SCAM_PHRASES
+               if re.search(r"\b" + re.escape(p) + r"\b", low)]
     return {
         "urls": URL_RE.findall(text),
         "phones": PHONE_RE.findall(text),
@@ -25,4 +33,5 @@ def analyze_features(text):
         "brands": brands,
         "urgency_words": urgency,
         "urgency_score": len(urgency),
+        "scam_phrases": phrases,
     }

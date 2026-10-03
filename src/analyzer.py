@@ -59,6 +59,17 @@ def analyze(text):
 
 def risk_score(result):
     score = result["probability"] * 100
+
+    no_signals = not (
+        result["urls"]
+        or result["phones"]
+        or result["brands"]
+        or result["urgency_words"]
+        or result["scam_phrases"]
+    )
+    if no_signals:
+        score *= 0.6  # trust the model less when nothing else looks risky
+
     score += min(result["urgency_score"], 3) * 4
     if result["urls"]:
         score += 8
@@ -66,6 +77,8 @@ def risk_score(result):
         score += 4
     if result["brands"]:
         score += 4
+    if result["scam_phrases"]:
+        score += 8
     if result["closest"]["similarity"] >= 0.4:
         score += 5
     return min(round(score), 100)
