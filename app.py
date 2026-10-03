@@ -64,7 +64,11 @@ if st.button("Analyze", type="primary"):
                 )
 
         st.subheader("Details found in the message")
-        st.write("**Links:** " + (", ".join(r["urls"]) or "none"))
+        if r["urls"]:
+            links = ", ".join(f"`{u}`" for u in r["urls"])
+            st.write("**Links (do not open):** " + links)
+        else:
+            st.write("**Links:** none")
         st.write("**Phone numbers:** " + (", ".join(r["phones"]) or "none"))
         st.write("**Amounts:** " + (", ".join(r["amounts"]) or "none"))
         st.write("**Brands mentioned:** " + (", ".join(r["brands"]) or "none"))
