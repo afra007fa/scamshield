@@ -1,5 +1,6 @@
 import streamlit as st
 from src.analyzer import analyze, risk_score, verdict
+from src.explain import explain
 
 st.set_page_config(page_title="ScamShield", page_icon="🛡️")
 
@@ -68,8 +69,21 @@ if st.button("Analyze", type="primary"):
         st.write("**Amounts:** " + (", ".join(r["amounts"]) or "none"))
         st.write("**Brands mentioned:** " + (", ".join(r["brands"]) or "none"))
 
+        if v != "Safe":
+            st.subheader("🤖 AI explanation and advice")
+            with st.spinner("Asking Gemini..."):
+                ai_text, ai_error = explain(text, r, score, v)
+            if ai_text:
+                st.write(ai_text)
+            else:
+                st.info(
+                    "The AI explanation is not available right now, but the "
+                    "analysis above is still valid."
+                )
+
 st.divider()
 st.caption(
     "Limitations: trained on public SMS datasets plus 43 hand-written Indian "
-    "scam examples. It can miss new scam styles. Never share OTPs or PINs."
+    "scam examples. It can miss new scam styles. Never share OTPs or PINs. "
+    "Report cyber fraud on 1930 or cybercrime.gov.in."
 )
